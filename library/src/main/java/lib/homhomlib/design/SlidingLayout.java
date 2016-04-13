@@ -68,8 +68,6 @@ public class SlidingLayout extends FrameLayout{
         final int action = MotionEventCompat.getActionMasked(ev);
 
         //判断拦截
-
-
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
@@ -100,10 +98,10 @@ public class SlidingLayout extends FrameLayout{
                         mIsBeingDragged = true;
                     }
                 }else if(y < mInitialDownY){
-                    //判断是否是上拉操作
+                    //判断是否是下拉操作
                     final float yDiff = mInitialDownY - y;
                     if (yDiff > mTouchSlop && !mIsBeingDragged && !canChildScrollDown()) {
-                        mInitialMotionY = mInitialDownY - mTouchSlop;
+                        mInitialMotionY = mInitialDownY + mTouchSlop;
                         mIsBeingDragged = true;
                     }
                 }
@@ -130,8 +128,12 @@ public class SlidingLayout extends FrameLayout{
         return MotionEventCompat.getY(ev, index);
     }
 
+    /**
+     * 判断View是否可以上拉
+     * @return
+     */
     public boolean canChildScrollUp() {
-        if (android.os.Build.VERSION.SDK_INT < 14) {
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             if (mViewFront instanceof AbsListView) {
                 final AbsListView absListView = (AbsListView) mViewFront;
                 return absListView.getChildCount() > 0
@@ -145,6 +147,10 @@ public class SlidingLayout extends FrameLayout{
         }
     }
 
+    /**
+     * 判断View是否可以下拉
+     * @return
+     */
     public boolean canChildScrollDown() {
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             if (mViewFront instanceof AbsListView) {
