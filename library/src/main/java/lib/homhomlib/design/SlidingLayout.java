@@ -9,11 +9,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.webkit.WebView;
 import android.widget.AbsListView;
 import android.widget.FrameLayout;
-
-import java.util.ArrayList;
 
 /**
  * Created by Linhh on 16/4/12.
@@ -24,8 +21,6 @@ public class SlidingLayout extends FrameLayout{
 
     private View mViewBack;//背景View
     private View mViewFront;//正面View
-
-    private static final int UN_SLIDING = 0;
 
     private boolean mIsBeingDragged;
     private float mInitialDownY;
