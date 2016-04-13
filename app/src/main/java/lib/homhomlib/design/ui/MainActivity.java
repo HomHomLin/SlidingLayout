@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
         mSlidingLayout.setBackView(View.inflate(this, R.layout.view_bg, null));
         View front = View.inflate(this,R.layout.view_front,null);
         WebView webView = (WebView) front.findViewById(R.id.webView);
-        webView.loadUrl("http://www.baidu.com");
+        webView.loadUrl("http://www.qq.com");
         mSlidingLayout.setFrontView(front);
     }
 }

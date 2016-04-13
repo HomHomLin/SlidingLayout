@@ -1,6 +1,7 @@
 package lib.homhomlib.design;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
@@ -68,10 +69,6 @@ public class SlidingLayout extends FrameLayout{
 
         //判断拦截
 
-        //子控件能否滑动
-        if (canChildScrollUp()) {
-            return false;
-        }
 
         switch (action) {
             case MotionEvent.ACTION_DOWN:
@@ -94,10 +91,21 @@ public class SlidingLayout extends FrameLayout{
                 if (y == -1) {
                     return false;
                 }
-                final float yDiff = y - mInitialDownY;
-                if (yDiff > mTouchSlop && !mIsBeingDragged) {
-                    mInitialMotionY = mInitialDownY + mTouchSlop;
-                    mIsBeingDragged = true;
+
+                if(y > mInitialDownY) {
+                    //判断是否是上拉操作
+                    final float yDiff = y - mInitialDownY;
+                    if (yDiff > mTouchSlop && !mIsBeingDragged && !canChildScrollUp()) {
+                        mInitialMotionY = mInitialDownY + mTouchSlop;
+                        mIsBeingDragged = true;
+                    }
+                }else if(y < mInitialDownY){
+                    //判断是否是上拉操作
+                    final float yDiff = mInitialDownY - y;
+                    if (yDiff > mTouchSlop && !mIsBeingDragged && !canChildScrollDown()) {
+                        mInitialMotionY = mInitialDownY - mTouchSlop;
+                        mIsBeingDragged = true;
+                    }
                 }
                 break;
 
@@ -134,6 +142,21 @@ public class SlidingLayout extends FrameLayout{
             }
         } else {
             return ViewCompat.canScrollVertically(mViewFront, -1);
+        }
+    }
+
+    public boolean canChildScrollDown() {
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            if (mViewFront instanceof AbsListView) {
+                final AbsListView absListView = (AbsListView) mViewFront;
+                return absListView.getChildCount() > 0
+                        && (absListView.getLastVisiblePosition() == absListView.getChildCount() - 1 || absListView.getChildAt(absListView.getChildCount() - 1)
+                        .getBottom() < absListView.getPaddingBottom());
+            } else {
+                return ViewCompat.canScrollVertically(mViewFront, 1) || mViewFront.getScrollY() > 0;
+            }
+        } else {
+            return ViewCompat.canScrollVertically(mViewFront, 1);
         }
     }
 
