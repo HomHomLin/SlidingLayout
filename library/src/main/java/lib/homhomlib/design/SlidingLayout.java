@@ -13,6 +13,8 @@ import android.view.ViewConfiguration;
 import android.widget.AbsListView;
 import android.widget.FrameLayout;
 
+import com.nineoldandroids.view.ViewHelper;
+
 /**
  * Created by Linhh on 16/4/12.
  */
@@ -265,7 +267,11 @@ public class SlidingLayout extends FrameLayout{
             view.post(new Runnable() {
                 @Override
                 public void run() {
-                    view.setTranslationY((int)delta);
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+                        view.setTranslationY(delta);
+                    }else{
+                        ViewHelper.setTranslationY(view, delta);
+                    }
                 }
             });
         }
@@ -274,7 +280,11 @@ public class SlidingLayout extends FrameLayout{
             view.post(new Runnable() {
                 @Override
                 public void run() {
-                    view.setY((int)y);
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+                        view.setY(y);
+                    }else{
+                        ViewHelper.setY(view,y);
+                    }
                 }
             });
         }
