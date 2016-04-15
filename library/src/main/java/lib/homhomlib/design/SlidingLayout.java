@@ -20,7 +20,7 @@ public class SlidingLayout extends FrameLayout{
     private int mTouchSlop;//系统允许最小的滑动判断值
 
     private View mViewBack;//背景View
-    private View mViewFront;//正面View
+    private View mTargetView;//正面View
 
     private boolean mIsBeingDragged;
     private float mInitialDownY;
@@ -49,16 +49,38 @@ public class SlidingLayout extends FrameLayout{
 
     public void setBackView(View view){
         mViewBack = view;
-        this.addView(view,0);
-    }
-
-    public void setFrontView(View view){
-        mViewFront = view;
-        this.addView(view);
+        this.addView(view, 0);
     }
 
     @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        if (getChildCount() == 0) {
+            return;
+        }
+        if (mTargetView == null) {
+            ensureTarget();
+        }
+        if (mTargetView == null) {
+            return;
+        }
+    }
+
+    private void ensureTarget() {
+        if (mTargetView == null) {
+            mTargetView = getChildAt(getChildCount() - 1);
+        }
+    }
+
+    //    public void setFrontView(View view){
+//        mViewFront = view;
+//        this.addView(view);
+//    }
+
+    @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+
+        ensureTarget();
 
         final int action = MotionEventCompat.getActionMasked(ev);
 
@@ -129,16 +151,16 @@ public class SlidingLayout extends FrameLayout{
      */
     public boolean canChildScrollUp() {
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            if (mViewFront instanceof AbsListView) {
-                final AbsListView absListView = (AbsListView) mViewFront;
+            if (mTargetView instanceof AbsListView) {
+                final AbsListView absListView = (AbsListView) mTargetView;
                 return absListView.getChildCount() > 0
                         && (absListView.getFirstVisiblePosition() > 0 || absListView.getChildAt(0)
                         .getTop() < absListView.getPaddingTop());
             } else {
-                return ViewCompat.canScrollVertically(mViewFront, -1) || mViewFront.getScrollY() > 0;
+                return ViewCompat.canScrollVertically(mTargetView, -1) || mTargetView.getScrollY() > 0;
             }
         } else {
-            return ViewCompat.canScrollVertically(mViewFront, -1);
+            return ViewCompat.canScrollVertically(mTargetView, -1);
         }
     }
 
@@ -148,16 +170,16 @@ public class SlidingLayout extends FrameLayout{
      */
     public boolean canChildScrollDown() {
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            if (mViewFront instanceof AbsListView) {
-                final AbsListView absListView = (AbsListView) mViewFront;
+            if (mTargetView instanceof AbsListView) {
+                final AbsListView absListView = (AbsListView) mTargetView;
                 return absListView.getChildCount() > 0
                         && (absListView.getLastVisiblePosition() == absListView.getChildCount() - 1 || absListView.getChildAt(absListView.getChildCount() - 1)
                         .getBottom() < absListView.getPaddingBottom());
             } else {
-                return ViewCompat.canScrollVertically(mViewFront, 1) || mViewFront.getScrollY() > 0;
+                return ViewCompat.canScrollVertically(mTargetView, 1) || mTargetView.getScrollY() > 0;
             }
         } else {
-            return ViewCompat.canScrollVertically(mViewFront, 1);
+            return ViewCompat.canScrollVertically(mTargetView, 1);
         }
     }
 
@@ -175,7 +197,7 @@ public class SlidingLayout extends FrameLayout{
             case MotionEvent.ACTION_MOVE:
                 Log.i("onTouchEvent", "move");
                 float delta = (event.getY() - mInitialMotionY) / 3.0F;
-                Instrument.getInstance().slidingByDelta(mViewFront, delta);
+                Instrument.getInstance().slidingByDelta(mTargetView, delta);
 //                if(delta > 0 ){
 //                    //向下滑动
 //                    Instrument.getInstance().slidingByDelta(mViewFront, delta);
@@ -186,7 +208,7 @@ public class SlidingLayout extends FrameLayout{
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                Instrument.getInstance().slidingToY(mViewFront,0);
+                Instrument.getInstance().slidingToY(mTargetView,0);
                 break;
         }
         //消费触摸
