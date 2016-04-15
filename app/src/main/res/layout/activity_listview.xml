@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<lib.homhomlib.design.SlidingLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/slidingLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <lib.homhomlib.design.SlidingLayout
-        android:id="@+id/slidingLayout"
+    android:layout_height="match_parent"
+    app:background_view="@layout/view_bg">
+    <ListView
+        android:id="@+id/listview"
+        android:background="#ffffff"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-</RelativeLayout>
+        android:layout_height="match_parent">
+    </ListView>
+</lib.homhomlib.design.SlidingLayout>

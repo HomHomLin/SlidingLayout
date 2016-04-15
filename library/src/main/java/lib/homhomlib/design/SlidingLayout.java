@@ -1,6 +1,7 @@
 package lib.homhomlib.design;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.os.Build;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
@@ -18,8 +19,9 @@ import android.widget.FrameLayout;
 public class SlidingLayout extends FrameLayout{
 
     private int mTouchSlop;//系统允许最小的滑动判断值
+    private int mBackgroundViewLayoutId;
 
-    private View mViewBack;//背景View
+    private View mBackgroundView;//背景View
     private View mTargetView;//正面View
 
     private boolean mIsBeingDragged;
@@ -40,21 +42,38 @@ public class SlidingLayout extends FrameLayout{
 
     public SlidingLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context, attrs);
     }
 
-    private void init(){
+    private void init(Context context, AttributeSet attrs){
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SlidingLayout);
+        mBackgroundViewLayoutId = a.getResourceId(R.styleable.SlidingLayout_background_view, 0);
+        if(mBackgroundViewLayoutId != 0){
+            View view = View.inflate(context, mBackgroundViewLayoutId, null);
+            setBackgroundView(view);
+        }
         mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
     }
 
-    public void setBackView(View view){
-        mViewBack = view;
+    public void setBackgroundView(View view){
+        if(mBackgroundView != null){
+            this.removeView(mBackgroundView);
+        }
+        mBackgroundView = view;
         this.addView(view, 0);
+    }
+
+    public View getBackgroundView(){
+        return this.mBackgroundView;
     }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
+        //实际上整个layout只能存在一个背景和一个前景才有用途
+//        if(getChildCount() > 2){
+//
+//        }
         if (getChildCount() == 0) {
             return;
         }
@@ -72,10 +91,17 @@ public class SlidingLayout extends FrameLayout{
         }
     }
 
-    //    public void setFrontView(View view){
-//        mViewFront = view;
-//        this.addView(view);
-//    }
+    public void setTargetView(View view){
+        if(mTargetView != null){
+            this.removeView(mTargetView);
+        }
+        mTargetView = view;
+        this.addView(view);
+    }
+
+    public View getTargetView(){
+        return this.mTargetView;
+    }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
