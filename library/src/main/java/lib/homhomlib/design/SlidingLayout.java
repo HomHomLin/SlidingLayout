@@ -264,29 +264,39 @@ public class SlidingLayout extends FrameLayout{
         }
 
         public void slidingByDelta(final View view ,final float delta){
-            view.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-                        view.setTranslationY(delta);
-                    }else{
-                        ViewHelper.setTranslationY(view, delta);
-                    }
-                }
-            });
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+                view.setTranslationY(delta);
+            }else{
+                ViewHelper.setTranslationY(view, delta);
+            }
+//            view.post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+//                        view.setTranslationY(delta);
+//                    }else{
+//                        ViewHelper.setTranslationY(view, delta);
+//                    }
+//                }
+//            });
         }
 
         public void slidingToY(final View view ,final float y){
-            view.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-                        view.setY(y);
-                    }else{
-                        ViewHelper.setY(view,y);
-                    }
-                }
-            });
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+                view.setY(y);
+            }else{
+                ViewHelper.setY(view,y);
+            }
+//            view.post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+//                        view.setY(y);
+//                    }else{
+//                        ViewHelper.setY(view,y);
+//                    }
+//                }
+//            });
         }
     }
 }
