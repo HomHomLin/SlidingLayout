@@ -67,7 +67,7 @@ SlidingLayout的使用非常简单，你只需要将你想实现的控件在XML�
 
 注意布局需要res-auto命名空间，注意将自己的控件设置一个背景，否则会将背景View透视出来。
 
-```java
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <lib.homhomlib.design.SlidingLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
