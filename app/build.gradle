@@ -25,4 +25,5 @@ dependencies {
     compile project(':library')
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.android.support:recyclerview-v7:23.3.0'
+//    compile 'homhomlin.lib:sldinglayout:0.2.0'
 }
