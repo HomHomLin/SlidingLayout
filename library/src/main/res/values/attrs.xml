@@ -2,5 +2,10 @@
 <resources>
     <declare-styleable name="SlidingLayout">
         <attr name="background_view" format="reference"/>
+        <attr name="sliding_mode" format="enum">
+            <enum name="both" value="0"/>
+            <enum name="top" value="1"/>
+            <enum name="bottom" value="2"/>
+        </attr>
     </declare-styleable>
 </resources>

@@ -2,13 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#767b86">
+    android:background="#8c8c8e">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textSize="15sp"
-        android:textColor="#FFFFFF"
-        android:padding="10dp"
+        android:textSize="12sp"
+        android:textColor="#f5f3f3"
+        android:padding="16dp"
+        android:text="developed by HomhomLin"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="14sp"
+        android:textColor="#f5f3f3"
+        android:padding="2dp"
         android:text="本项目由HomhomLin开发"/>
 </LinearLayout>

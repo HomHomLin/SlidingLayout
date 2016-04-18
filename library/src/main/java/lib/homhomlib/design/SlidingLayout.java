@@ -31,6 +31,13 @@ public class SlidingLayout extends FrameLayout{
     private float mInitialMotionY;
     private int mActivePointerId = INVALID_POINTER;
 
+    private float mSlidingOffset = 3.0F;
+
+    public static final int SLIDING_MODE_BOTH = 0;
+    public static final int SLIDING_MODE_TOP = 1;
+    public static final int SLIDING_MODE_BOTTOM = 2;
+
+    private int mSlidingMode = SLIDING_MODE_BOTH;
 
     private static final int INVALID_POINTER = -1;
 
@@ -50,8 +57,10 @@ public class SlidingLayout extends FrameLayout{
     private void init(Context context, AttributeSet attrs){
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SlidingLayout);
         mBackgroundViewLayoutId = a.getResourceId(R.styleable.SlidingLayout_background_view, 0);
+        mSlidingMode = a.getInteger(R.styleable.SlidingLayout_sliding_mode,SLIDING_MODE_BOTH);
+        a.recycle();
         if(mBackgroundViewLayoutId != 0){
-            View view = View.inflate(context, mBackgroundViewLayoutId, null);
+            View view = View.inflate(getContext(), mBackgroundViewLayoutId, null);
             setBackgroundView(view);
         }
         mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
@@ -115,6 +124,7 @@ public class SlidingLayout extends FrameLayout{
         //判断拦截
         switch (action) {
             case MotionEvent.ACTION_DOWN:
+//                Log.i("onInterceptTouchEvent", "down");
                 mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
                 mIsBeingDragged = false;
                 final float initialDownY = getMotionEventY(ev, mActivePointerId);
@@ -157,6 +167,7 @@ public class SlidingLayout extends FrameLayout{
 
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
+//                Log.i("onInterceptTouchEvent", "up");
                 mIsBeingDragged = false;
                 mActivePointerId = INVALID_POINTER;
                 break;
@@ -221,11 +232,29 @@ public class SlidingLayout extends FrameLayout{
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
+//                Log.i("onTouchEvent", "down");
                 break;
             case MotionEvent.ACTION_MOVE:
-                Log.i("onTouchEvent", "move");
-                float delta = (event.getY() - mInitialMotionY) / 3.0F;
-                Instrument.getInstance().slidingByDelta(mTargetView, delta);
+//                Log.i("onTouchEvent", "move");
+                float delta = (event.getY() - mInitialMotionY) / mSlidingOffset;
+                switch (mSlidingMode){
+                    case SLIDING_MODE_BOTH:
+                        Instrument.getInstance().slidingByDelta(mTargetView, delta);
+                        break;
+                    case SLIDING_MODE_TOP:
+                        if(delta > 0 ){
+                            //向下滑动
+                            Instrument.getInstance().slidingByDelta(mTargetView, delta);
+                        }
+                        break;
+                    case SLIDING_MODE_BOTTOM:
+                        if(delta < 0 ){
+                            //向下滑动
+                            Instrument.getInstance().slidingByDelta(mTargetView, delta);
+                        }
+                        break;
+                }
+//                Instrument.getInstance().slidingByDelta(mTargetView, delta);
 //                if(delta > 0 ){
 //                    //向下滑动
 //                    Instrument.getInstance().slidingByDelta(mViewFront, delta);
@@ -236,11 +265,20 @@ public class SlidingLayout extends FrameLayout{
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                Instrument.getInstance().slidingToY(mTargetView,0);
+//                Log.i("onTouchEvent", "up");
+                Instrument.getInstance().slidingToY(mTargetView, 0);
                 break;
         }
         //消费触摸
         return true;
+    }
+
+    public void setSlidingMode(int mode){
+        mSlidingMode = mode;
+    }
+
+    public int getSlidingMode(){
+        return mSlidingMode;
     }
 
     @Override
@@ -252,6 +290,12 @@ public class SlidingLayout extends FrameLayout{
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        if(mTargetView != null){
+            mTargetView.clearAnimation();
+        }
+        mSlidingMode = 0;
+        mTargetView = null;
+        mBackgroundView = null;
     }
 
     static class Instrument {
@@ -264,39 +308,25 @@ public class SlidingLayout extends FrameLayout{
         }
 
         public void slidingByDelta(final View view ,final float delta){
+            if(view == null){
+                return;
+            }
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
                 view.setTranslationY(delta);
             }else{
                 ViewHelper.setTranslationY(view, delta);
             }
-//            view.post(new Runnable() {
-//                @Override
-//                public void run() {
-//                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-//                        view.setTranslationY(delta);
-//                    }else{
-//                        ViewHelper.setTranslationY(view, delta);
-//                    }
-//                }
-//            });
         }
 
         public void slidingToY(final View view ,final float y){
+            if(view == null){
+                return;
+            }
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
                 view.setY(y);
             }else{
                 ViewHelper.setY(view,y);
             }
-//            view.post(new Runnable() {
-//                @Override
-//                public void run() {
-//                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-//                        view.setY(y);
-//                    }else{
-//                        ViewHelper.setY(view,y);
-//                    }
-//                }
-//            });
         }
     }
 }

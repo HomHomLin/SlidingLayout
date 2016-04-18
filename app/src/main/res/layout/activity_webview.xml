@@ -4,6 +4,7 @@
     android:id="@+id/slidingLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:sliding_mode="top"
     app:background_view="@layout/view_bg">
     <WebView
         android:id="@+id/webView"

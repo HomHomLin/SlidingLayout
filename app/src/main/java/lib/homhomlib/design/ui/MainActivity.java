@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
         webView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this,WebViewActivity.class));
+                startActivity(new Intent(MainActivity.this, WebViewActivity.class));
             }
         });
         Button listView = (Button)this.findViewById(R.id.btnListView);
@@ -25,6 +25,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this,ListViewActivity.class));
+            }
+        });
+        Button recyclerView = (Button)this.findViewById(R.id.btnRecyclerView);
+        recyclerView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this,RecyclerViewActivity.class));
             }
         });
     }
