@@ -12,7 +12,11 @@ Project site： <https://github.com/HomHomLin/SlidingLayout>.
 
 效果图：
 
+![p1](https://raw.githubusercontent.com/HomHomLin/SlidingLayout/master/pic/demo.gif)
 
+![p2](https://raw.githubusercontent.com/HomHomLin/SlidingLayout/master/pic/list.gif)
+
+![p3](https://raw.githubusercontent.com/HomHomLin/SlidingLayout/master/pic/webview.gif)
 
 ##导入项目
 
