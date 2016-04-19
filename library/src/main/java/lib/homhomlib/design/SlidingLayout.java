@@ -42,6 +42,16 @@ public class SlidingLayout extends FrameLayout{
 
     private static final int INVALID_POINTER = -1;
 
+    private SlidingListener mSlidingListener;
+
+    public static final int STATE_SLIDING = 2;
+    public static final int STATE_IDLE = 1;
+
+    public interface SlidingListener{
+        public void onSlidingOffset(View view, float delta);
+        public void onSlidingStateChange(View view ,int state);
+    }
+
     public SlidingLayout(Context context) {
         this(context, null);
     }
@@ -93,6 +103,10 @@ public class SlidingLayout extends FrameLayout{
      */
     public void setSlidingOffset(float slidingOffset){
         this.mSlidingOffset = slidingOffset;
+    }
+
+    public void setSlidingListener(SlidingListener slidingListener){
+        this.mSlidingListener = slidingListener;
     }
 
     @Override
@@ -254,6 +268,10 @@ public class SlidingLayout extends FrameLayout{
             case MotionEvent.ACTION_MOVE:
 //                Log.i("onTouchEvent", "move");
                 float delta = (event.getY() - mInitialMotionY) / mSlidingOffset;
+                if(mSlidingListener != null){
+                    mSlidingListener.onSlidingStateChange(this, STATE_SLIDING);
+                    mSlidingListener.onSlidingOffset(this,delta);
+                }
                 switch (mSlidingMode){
                     case SLIDING_MODE_BOTH:
                         Instrument.getInstance().slidingByDelta(mTargetView, delta);
@@ -283,6 +301,9 @@ public class SlidingLayout extends FrameLayout{
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
 //                Log.i("onTouchEvent", "up");
+                if(mSlidingListener != null){
+                    mSlidingListener.onSlidingStateChange(this, STATE_IDLE);
+                }
                 Instrument.getInstance().reset(mTargetView);
                 break;
         }
@@ -313,6 +334,7 @@ public class SlidingLayout extends FrameLayout{
         mSlidingMode = 0;
         mTargetView = null;
         mBackgroundView = null;
+        mSlidingListener = null;
     }
 
     static class Instrument {
