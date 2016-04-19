@@ -6,7 +6,6 @@ import android.os.Build;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -31,7 +30,9 @@ public class SlidingLayout extends FrameLayout{
     private float mInitialMotionY;
     private int mActivePointerId = INVALID_POINTER;
 
-    private float mSlidingOffset = 3.0F;
+    private float mSlidingOffset = 2.0F;
+
+    private static final int RESET_DURATION = 300;
 
     public static final int SLIDING_MODE_BOTH = 0;
     public static final int SLIDING_MODE_TOP = 1;
@@ -76,6 +77,22 @@ public class SlidingLayout extends FrameLayout{
 
     public View getBackgroundView(){
         return this.mBackgroundView;
+    }
+
+    /**
+     * 获得滑动幅度
+     * @return
+     */
+    public float getSlidingOffset(){
+        return this.mSlidingOffset;
+    }
+
+    /**
+     * 设置滑动幅度
+     * @param slidingOffset
+     */
+    public void setSlidingOffset(float slidingOffset){
+        this.mSlidingOffset = slidingOffset;
     }
 
     @Override
@@ -266,7 +283,7 @@ public class SlidingLayout extends FrameLayout{
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
 //                Log.i("onTouchEvent", "up");
-                Instrument.getInstance().slidingToY(mTargetView, 0);
+                Instrument.getInstance().reset(mTargetView);
                 break;
         }
         //消费触摸
@@ -311,6 +328,7 @@ public class SlidingLayout extends FrameLayout{
             if(view == null){
                 return;
             }
+            view.clearAnimation();
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
                 view.setTranslationY(delta);
             }else{
@@ -322,10 +340,23 @@ public class SlidingLayout extends FrameLayout{
             if(view == null){
                 return;
             }
+            view.clearAnimation();
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
                 view.setY(y);
             }else{
                 ViewHelper.setY(view,y);
+            }
+        }
+
+        public void reset(final View view){
+            if(view == null){
+                return;
+            }
+            view.clearAnimation();
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+                android.animation.ObjectAnimator.ofFloat(view, "translationY", 0F).setDuration(RESET_DURATION).start();
+            }else{
+                com.nineoldandroids.animation.ObjectAnimator.ofFloat(view, "translationY", 0F).setDuration(RESET_DURATION).start();
             }
         }
     }
