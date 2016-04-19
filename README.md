@@ -48,7 +48,7 @@ compile 'com.nineoldandroids:library:2.4.0'
 
 SlidingLayout的使用非常简单，你只需要将你想实现的控件在XML布局中嵌套进SlidingLayout即可，如你需要让ListView实现果冻效果：
 
-### 1.创建背景View的xml
+### `1.创建背景View的xml`
 
 ``` xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -63,7 +63,7 @@ SlidingLayout的使用非常简单，你只需要将你想实现的控件在XML�
     android:text="developed by HomhomLin"/>
 ```
 
-### 2.将你的控件放进SlidingLayout中
+### `2.将你的控件放进SlidingLayout中`
 
 注意布局需要res-auto命名空间，注意将自己的控件设置一个背景，否则会将背景View透视出来。
 
@@ -86,7 +86,7 @@ SlidingLayout的使用非常简单，你只需要将你想实现的控件在XML�
 </lib.homhomlib.design.SlidingLayout>
 ```
 
-### 3.没有第三步啦！
+### `3.没有第三步啦！`
 
 运行即可看到效果！具体其他的内容可以看Demo。
 
@@ -97,11 +97,11 @@ SlidingLayout的使用非常简单，你只需要将你想实现的控件在XML�
 
 ## API
 
- * public void setSlidingOffset(float slidingOffset) 设置控件的滑动幅度，有效值从1.0F起，值越大可以滑动的幅度越小，默认为2.0F
- * public void setTargetView(View view) 设置控件的前景View
- * public void setBackgroundView(View view) 设置控件的背景View
- * public void setSlidingListener(SlidingListener slidingListener) 给控件设置监听，可以监听滑动情况
- * public void setSlidingMode(int mode) 设置滑动模式
+ * `public void setSlidingOffset(float slidingOffset)` 设置控件的滑动幅度，有效值从1.0F起，值越大可以滑动的幅度越小，默认为2.0F
+ * `public void setTargetView(View view)` 设置控件的前景View
+ * `public void setBackgroundView(View view)` 设置控件的背景View
+ * `public void setSlidingListener(SlidingListener slidingListener)` 给控件设置监听，可以监听滑动情况
+ * `public void setSlidingMode(int mode)` 设置滑动模式
 
 ## Developed By
 
