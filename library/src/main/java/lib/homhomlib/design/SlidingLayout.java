@@ -33,6 +33,7 @@ public class SlidingLayout extends FrameLayout{
     private float mSlidingOffset = 2.0F;
 
     private static final int RESET_DURATION = 300;
+    private static final int SMOOTH_DURATION = 1000;
 
     public static final int SLIDING_MODE_BOTH = 0;
     public static final int SLIDING_MODE_TOP = 1;
@@ -319,6 +320,10 @@ public class SlidingLayout extends FrameLayout{
         return mSlidingMode;
     }
 
+    public void smoothScrollTo(float y){
+        Instrument.getInstance().smoothTo(mTargetView, y);
+    }
+
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -366,7 +371,7 @@ public class SlidingLayout extends FrameLayout{
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
                 view.setY(y);
             }else{
-                ViewHelper.setY(view,y);
+                ViewHelper.setY(view, y);
             }
         }
 
@@ -379,6 +384,18 @@ public class SlidingLayout extends FrameLayout{
                 android.animation.ObjectAnimator.ofFloat(view, "translationY", 0F).setDuration(RESET_DURATION).start();
             }else{
                 com.nineoldandroids.animation.ObjectAnimator.ofFloat(view, "translationY", 0F).setDuration(RESET_DURATION).start();
+            }
+        }
+
+        public void smoothTo(final View view ,final float y){
+            if(view == null){
+                return;
+            }
+            view.clearAnimation();
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+                android.animation.ObjectAnimator.ofFloat(view, "translationY", y).setDuration(SMOOTH_DURATION).start();
+            }else{
+                com.nineoldandroids.animation.ObjectAnimator.ofFloat(view, "translationY", y).setDuration(SMOOTH_DURATION).start();
             }
         }
     }
