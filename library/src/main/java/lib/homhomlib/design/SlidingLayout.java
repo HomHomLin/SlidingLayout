@@ -242,8 +242,8 @@ public class SlidingLayout extends FrameLayout{
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             if (mTargetView instanceof AbsListView) {
                 final AbsListView absListView = (AbsListView) mTargetView;
-                return absListView.getChildCount() > 0
-                        && (absListView.getLastVisiblePosition() == absListView.getChildCount() - 1 || absListView.getChildAt(absListView.getChildCount() - 1)
+                return absListView.getChildCount() > 0 && absListView.getAdapter() != null
+                        && (absListView.getLastVisiblePosition() < absListView.getAdapter().getCount() - 1 || absListView.getChildAt(absListView.getChildCount() - 1)
                         .getBottom() < absListView.getPaddingBottom());
             } else {
                 return ViewCompat.canScrollVertically(mTargetView, 1) || mTargetView.getScrollY() > 0;
