@@ -35,6 +35,11 @@ public class ListViewActivity extends AppCompatActivity {
             public void onSlidingStateChange(View view, int state) {
                 Log.i(TAG,"onSlidingStateChange:" + state);
             }
+
+            @Override
+            public void onSlidingChangePointer(View view, int pointerId) {
+
+            }
         });
 //        mSlidingLayout.setFrontView(front);
     }

@@ -6,7 +6,6 @@ import android.os.Build;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -53,6 +52,7 @@ public class SlidingLayout extends FrameLayout{
     public interface SlidingListener{
         public void onSlidingOffset(View view, float delta);
         public void onSlidingStateChange(View view ,int state);
+        public void onSlidingChangePointer(View view, int pointerId);
     }
 
     public SlidingLayout(Context context) {
@@ -271,19 +271,22 @@ public class SlidingLayout extends FrameLayout{
 //                Log.i("onTouchEvent", "down");
                 break;
             case MotionEvent.ACTION_MOVE:
+                //homhom:it's different betweenn more than one pointer
                 int activePointerId = MotionEventCompat.getPointerId(event, event.getPointerCount() - 1);
                 if(mActivePointerId != activePointerId){
-                    //换手指了
+                    //change pointer
 //                    Log.i("onTouchEvent","change point");
                     mActivePointerId = activePointerId;
-                    mInitialMotionY = getMotionEventY(event, mActivePointerId);
+                    mInitialDownY = getMotionEventY(event, mActivePointerId);
+                    mInitialMotionY = mInitialDownY + mTouchSlop;
                     mLastMotionY = mInitialMotionY;
+                    if(mSlidingListener != null){
+                        mSlidingListener.onSlidingChangePointer(mTargetView,activePointerId);
+                    }
                 }
-//                Log.i("onTouchEvent", "move:" + mTargetView.getTranslationY());
-                //多根手指的lastmotion不一样
-                //用于判断手指移动情况
+                //used for judge which side move to
                 float movemment = getMotionEventY(event, mActivePointerId) - mInitialMotionY;
-                //手指的位移
+                //pointer delta
                 float delta = Instrument.getInstance().getTranslationY(mTargetView)
                         + ((getMotionEventY(event, mActivePointerId) - mLastMotionY))
                         / mSlidingOffset;
