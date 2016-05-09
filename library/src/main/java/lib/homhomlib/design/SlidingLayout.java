@@ -6,6 +6,7 @@ import android.os.Build;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -28,6 +29,7 @@ public class SlidingLayout extends FrameLayout{
     private boolean mIsBeingDragged;
     private float mInitialDownY;
     private float mInitialMotionY;
+    private float mLastMotionY;
     private int mActivePointerId = INVALID_POINTER;
 
     private float mSlidingOffset = 2.0F;
@@ -182,6 +184,7 @@ public class SlidingLayout extends FrameLayout{
                     final float yDiff = y - mInitialDownY;
                     if (yDiff > mTouchSlop && !mIsBeingDragged && !canChildScrollUp()) {
                         mInitialMotionY = mInitialDownY + mTouchSlop;
+                        mLastMotionY = mInitialMotionY;
                         mIsBeingDragged = true;
                     }
                 }else if(y < mInitialDownY){
@@ -189,6 +192,7 @@ public class SlidingLayout extends FrameLayout{
                     final float yDiff = mInitialDownY - y;
                     if (yDiff > mTouchSlop && !mIsBeingDragged && !canChildScrollDown()) {
                         mInitialMotionY = mInitialDownY + mTouchSlop;
+                        mLastMotionY = mInitialMotionY;
                         mIsBeingDragged = true;
                     }
                 }
@@ -218,7 +222,7 @@ public class SlidingLayout extends FrameLayout{
 
     /**
      * 判断View是否可以上拉
-     * @return
+     * @return canChildScrollUp
      */
     public boolean canChildScrollUp() {
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -237,7 +241,7 @@ public class SlidingLayout extends FrameLayout{
 
     /**
      * 判断View是否可以下拉
-     * @return
+     * @return canChildScrollDown
      */
     public boolean canChildScrollDown() {
         if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -267,8 +271,24 @@ public class SlidingLayout extends FrameLayout{
 //                Log.i("onTouchEvent", "down");
                 break;
             case MotionEvent.ACTION_MOVE:
-//                Log.i("onTouchEvent", "move");
-                float delta = (event.getY() - mInitialMotionY) / mSlidingOffset;
+                int activePointerId = MotionEventCompat.getPointerId(event, event.getPointerCount() - 1);
+                if(mActivePointerId != activePointerId){
+                    //换手指了
+//                    Log.i("onTouchEvent","change point");
+                    mActivePointerId = activePointerId;
+                    mInitialMotionY = getMotionEventY(event, mActivePointerId);
+                    mLastMotionY = mInitialMotionY;
+                }
+//                Log.i("onTouchEvent", "move:" + mTargetView.getTranslationY());
+                //多根手指的lastmotion不一样
+                //用于判断手指移动情况
+                float movemment = getMotionEventY(event, mActivePointerId) - mInitialMotionY;
+                //手指的位移
+                float delta = Instrument.getInstance().getTranslationY(mTargetView)
+                        + ((getMotionEventY(event, mActivePointerId) - mLastMotionY))
+                        / mSlidingOffset;
+                mLastMotionY = getMotionEventY(event, mActivePointerId);
+//                float delta = (event.getY() - mInitialMotionY) / mSlidingOffset;
                 if(mSlidingListener != null){
                     mSlidingListener.onSlidingStateChange(this, STATE_SLIDING);
                     mSlidingListener.onSlidingOffset(this,delta);
@@ -278,25 +298,18 @@ public class SlidingLayout extends FrameLayout{
                         Instrument.getInstance().slidingByDelta(mTargetView, delta);
                         break;
                     case SLIDING_MODE_TOP:
-                        if(delta > 0 ){
+                        if(movemment > 0 ){
                             //向下滑动
                             Instrument.getInstance().slidingByDelta(mTargetView, delta);
                         }
                         break;
                     case SLIDING_MODE_BOTTOM:
-                        if(delta < 0 ){
+                        if(movemment < 0 ){
                             //向下滑动
                             Instrument.getInstance().slidingByDelta(mTargetView, delta);
                         }
                         break;
                 }
-//                Instrument.getInstance().slidingByDelta(mTargetView, delta);
-//                if(delta > 0 ){
-//                    //向下滑动
-//                    Instrument.getInstance().slidingByDelta(mViewFront, delta);
-//                }else{
-//                    //向上滑动
-//                }
 
                 break;
             case MotionEvent.ACTION_UP:
@@ -349,6 +362,14 @@ public class SlidingLayout extends FrameLayout{
                 mInstrument = new Instrument();
             }
             return mInstrument;
+        }
+
+        public float getTranslationY(View view){
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+                return view.getTranslationY();
+            }else{
+                return ViewHelper.getTranslationY(view);
+            }
         }
 
         public void slidingByDelta(final View view ,final float delta){
