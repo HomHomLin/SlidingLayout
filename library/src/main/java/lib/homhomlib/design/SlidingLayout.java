@@ -20,7 +20,7 @@ import com.nineoldandroids.view.ViewHelper;
 public class SlidingLayout extends FrameLayout{
 
     private int mTouchSlop;//系统允许最小的滑动判断值
-    private int mBackgroundViewLayoutId;
+    private int mBackgroundViewLayoutId = 0;
 
     private View mBackgroundView;//背景View
     private View mTargetView;//正面View
@@ -31,16 +31,21 @@ public class SlidingLayout extends FrameLayout{
     private float mLastMotionY;
     private int mActivePointerId = INVALID_POINTER;
 
-    private float mSlidingOffset = 2.0F;
+    private float mSlidingOffset = 2.0F;//滑动系数
 
-    private static final int RESET_DURATION = 300;
+    private static final int RESET_DURATION = 200;
     private static final int SMOOTH_DURATION = 1000;
 
     public static final int SLIDING_MODE_BOTH = 0;
     public static final int SLIDING_MODE_TOP = 1;
     public static final int SLIDING_MODE_BOTTOM = 2;
 
+    public static final int SLIDING_POINTER_MODE_ONE = 0;
+    public static final int SLIDING_POINTER_MODE_MORE = 1;
+
     private int mSlidingMode = SLIDING_MODE_BOTH;
+
+    private int mSlidingPointerMode = SLIDING_POINTER_MODE_MORE;
 
     private static final int INVALID_POINTER = -1;
 
@@ -50,6 +55,7 @@ public class SlidingLayout extends FrameLayout{
     public static final int STATE_IDLE = 1;
 
     public interface SlidingListener{
+        //不能操作繁重的任务在这里
         public void onSlidingOffset(View view, float delta);
         public void onSlidingStateChange(View view ,int state);
         public void onSlidingChangePointer(View view, int pointerId);
@@ -70,8 +76,9 @@ public class SlidingLayout extends FrameLayout{
 
     private void init(Context context, AttributeSet attrs){
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SlidingLayout);
-        mBackgroundViewLayoutId = a.getResourceId(R.styleable.SlidingLayout_background_view, 0);
+        mBackgroundViewLayoutId = a.getResourceId(R.styleable.SlidingLayout_background_view, mBackgroundViewLayoutId);
         mSlidingMode = a.getInteger(R.styleable.SlidingLayout_sliding_mode,SLIDING_MODE_BOTH);
+        mSlidingPointerMode = a.getInteger(R.styleable.SlidingLayout_sliding_pointer_mode,SLIDING_POINTER_MODE_MORE);
         a.recycle();
         if(mBackgroundViewLayoutId != 0){
             View view = View.inflate(getContext(), mBackgroundViewLayoutId, null);
@@ -271,27 +278,38 @@ public class SlidingLayout extends FrameLayout{
 //                Log.i("onTouchEvent", "down");
                 break;
             case MotionEvent.ACTION_MOVE:
-                //homhom:it's different betweenn more than one pointer
-                int activePointerId = MotionEventCompat.getPointerId(event, event.getPointerCount() - 1);
-                if(mActivePointerId != activePointerId){
-                    //change pointer
+                float delta = 0.0f;
+                float movemment = 0.0f;
+                if(mSlidingPointerMode == SLIDING_POINTER_MODE_MORE) {
+                    //homhom:it's different betweenn more than one pointer
+                    int activePointerId = MotionEventCompat.getPointerId(event, event.getPointerCount() - 1);
+                    if (mActivePointerId != activePointerId) {
+                        //change pointer
 //                    Log.i("onTouchEvent","change point");
-                    mActivePointerId = activePointerId;
-                    mInitialDownY = getMotionEventY(event, mActivePointerId);
-                    mInitialMotionY = mInitialDownY + mTouchSlop;
-                    mLastMotionY = mInitialMotionY;
-                    if(mSlidingListener != null){
-                        mSlidingListener.onSlidingChangePointer(mTargetView,activePointerId);
+                        mActivePointerId = activePointerId;
+                        mInitialDownY = getMotionEventY(event, mActivePointerId);
+                        mInitialMotionY = mInitialDownY + mTouchSlop;
+                        mLastMotionY = mInitialMotionY;
+                        if (mSlidingListener != null) {
+                            mSlidingListener.onSlidingChangePointer(mTargetView, activePointerId);
+                        }
                     }
+
+                    //pointer delta
+                    delta = Instrument.getInstance().getTranslationY(mTargetView)
+                            + ((getMotionEventY(event, mActivePointerId) - mLastMotionY))
+                            / mSlidingOffset;
+
+                    mLastMotionY = getMotionEventY(event, mActivePointerId);
+
+                    //used for judge which side move to
+                    movemment = getMotionEventY(event, mActivePointerId) - mInitialMotionY;
+                }else {
+                    delta = (event.getY() - mInitialMotionY) / mSlidingOffset;
+                    //used for judge which side move to
+                    movemment = event.getY() - mInitialMotionY;
                 }
-                //used for judge which side move to
-                float movemment = getMotionEventY(event, mActivePointerId) - mInitialMotionY;
-                //pointer delta
-                float delta = Instrument.getInstance().getTranslationY(mTargetView)
-                        + ((getMotionEventY(event, mActivePointerId) - mLastMotionY))
-                        / mSlidingOffset;
-                mLastMotionY = getMotionEventY(event, mActivePointerId);
-//                float delta = (event.getY() - mInitialMotionY) / mSlidingOffset;
+
                 if(mSlidingListener != null){
                     mSlidingListener.onSlidingStateChange(this, STATE_SLIDING);
                     mSlidingListener.onSlidingOffset(this,delta);

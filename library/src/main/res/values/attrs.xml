@@ -7,5 +7,9 @@
             <enum name="top" value="1"/>
             <enum name="bottom" value="2"/>
         </attr>
+        <attr name="sliding_pointer_mode" format="enum">
+            <enum name="one" value="0"/>
+            <enum name="more" value="1"/>
+        </attr>
     </declare-styleable>
 </resources>
