@@ -8,7 +8,9 @@ SlidingLayout简单易用，最低支持Android api v9。
 
 Project site： <https://github.com/HomHomLin/SlidingLayout>.
 
-最新版本:v0.5.0
+Demo: <https://github.com/HomHomLin/SlidingLayout/tree/master/demo>.
+
+最新版本:v0.8.0
 
 ## 效果图：
 
@@ -22,7 +24,7 @@ Project site： <https://github.com/HomHomLin/SlidingLayout>.
 
 **Gradle dependency:**
 ``` groovy
-compile 'homhomlin.lib:sldinglayout:0.5.0'
+compile 'homhomlin.lib:sldinglayout:0.8.0'
 ```
 
 or
@@ -32,7 +34,7 @@ or
 <dependency>
   <groupId>homhomlin.lib</groupId>
   <artifactId>sldinglayout</artifactId>
-  <version>0.5.0</version>
+  <version>0.8.0</version>
 </dependency>
 ```
 
@@ -94,6 +96,7 @@ SlidingLayout的使用非常简单，你只需要将你想实现的控件在XML�
 
  * `background_view` 背景view
  * `sliding_mode` 滑动模式，both为上下可弹跳，top为顶部弹跳，bottom为底部弹跳，默认为both
+ * `sliding_pointer_mode` 手指模式，one为只识别一个手指，more为支持多指滑动，默认为more
 
 ## API
 
