@@ -168,6 +168,13 @@ public class SlidingLayout extends FrameLayout{
         return this.mTargetView;
     }
 
+    public float getSlidingDistance(){
+        if(getTargetView() != null){
+            return Instrument.getInstance().getTranslationY(getTargetView());
+        }
+        return 0;
+    }
+
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
 
@@ -323,31 +330,42 @@ public class SlidingLayout extends FrameLayout{
                     movemment = event.getY() - mInitialMotionY;
                 }
 
-                if(mSlidingListener != null){
-                    mSlidingListener.onSlidingStateChange(this, STATE_SLIDING);
-                    mSlidingListener.onSlidingOffset(this,delta);
-                }
-
                 if(mSlidingMaxDistance == SLIDING_DISTANCE_UNDEFINED || movemment < mSlidingMaxDistance){
                     //超过滑动
                 }
+
+                float distance = getSlidingDistance();
 
                 switch (mSlidingMode){
                     case SLIDING_MODE_BOTH:
                         Instrument.getInstance().slidingByDelta(mTargetView, delta);
                         break;
                     case SLIDING_MODE_TOP:
-                        if(movemment >= 0 ){
+                        if(movemment >= 0 || distance > 0){
                             //向下滑动
+                            if(delta < 0 ){
+                                //如果还往上滑，就让它归零
+                                delta = 0;
+                            }
                             Instrument.getInstance().slidingByDelta(mTargetView, delta);
                         }
                         break;
                     case SLIDING_MODE_BOTTOM:
-                        if(movemment <= 0 ){
-                            //向下滑动
+                        if(movemment <= 0 || distance < 0){
+                            //向上滑动
+                            if(delta > 0 ){
+                                //如果还往下滑，就让它归零
+                                delta = 0;
+                            }
                             Instrument.getInstance().slidingByDelta(mTargetView, delta);
                         }
                         break;
+                }
+
+
+                if(mSlidingListener != null){
+                    mSlidingListener.onSlidingStateChange(this, STATE_SLIDING);
+                    mSlidingListener.onSlidingOffset(this,delta);
                 }
 
                 break;
