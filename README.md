@@ -10,7 +10,7 @@ Project site： <https://github.com/HomHomLin/SlidingLayout>.
 
 Demo: <https://github.com/HomHomLin/SlidingLayout/tree/master/demo>.
 
-最新版本:v0.8.0
+最新版本:v0.8.1
 
 ## 效果图：
 
@@ -24,7 +24,7 @@ Demo: <https://github.com/HomHomLin/SlidingLayout/tree/master/demo>.
 
 **Gradle dependency:**
 ``` groovy
-compile 'homhomlin.lib:sldinglayout:0.8.0'
+compile 'homhomlin.lib:sldinglayout:0.8.1'
 ```
 
 or
@@ -34,7 +34,7 @@ or
 <dependency>
   <groupId>homhomlin.lib</groupId>
   <artifactId>sldinglayout</artifactId>
-  <version>0.8.0</version>
+  <version>0.8.1</version>
 </dependency>
 ```
 
@@ -97,14 +97,16 @@ SlidingLayout的使用非常简单，你只需要将你想实现的控件在XML�
  * `background_view` 背景view
  * `sliding_mode` 滑动模式，both为上下可弹跳，top为顶部弹跳，bottom为底部弹跳，默认为both
  * `sliding_pointer_mode` 手指模式，one为只识别一个手指，more为支持多指滑动，默认为more
+ * `top_max` 当滑动模式为top时才有效，用于可滑动的最大距离，如"top_max:200dp"，默认为-1（不限制）
 
-## API
+## 常用API
 
- * `public void setSlidingOffset(float slidingOffset)` 设置控件的滑动幅度，有效值从1.0F起，值越大可以滑动的幅度越小，默认为2.0F
+ * `public void setSlidingOffset(float slidingOffset)` 设置控件的滑动阻力，有效值从1.0F起，值越大可以滑动的幅度越小，默认为2.0F
  * `public void setTargetView(View view)` 设置控件的前景View
  * `public void setBackgroundView(View view)` 设置控件的背景View
  * `public void setSlidingListener(SlidingListener slidingListener)` 给控件设置监听，可以监听滑动情况
  * `public void setSlidingMode(int mode)` 设置滑动模式
+ * `public void setSlidingDistance(int max)` 设置最大滑动距离，仅在top模式下有效
 
 ## Developed By
 

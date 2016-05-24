@@ -6,16 +6,14 @@ import android.os.Build;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.AbsListView;
 import android.widget.FrameLayout;
 
-import com.nineoldandroids.view.ViewHelper;
-
 /**
+ * github:https://github.com/HomHomLin/SlidingLayout
  * Created by Linhh on 16/4/12.
  */
 public class SlidingLayout extends FrameLayout{
