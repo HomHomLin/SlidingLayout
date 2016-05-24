@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:sliding_pointer_mode="more"
-    app:sliding_mode="bottom"
+    app:sliding_mode="both"
     app:background_view="@layout/view_bg">
     <ListView
         android:id="@+id/listview"

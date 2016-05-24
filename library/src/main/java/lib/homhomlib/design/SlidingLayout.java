@@ -6,6 +6,7 @@ import android.os.Build;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -54,9 +55,11 @@ public class SlidingLayout extends FrameLayout{
     public static final int STATE_SLIDING = 2;
     public static final int STATE_IDLE = 1;
 
-    private int mSlidingMaxDistance = SLIDING_DISTANCE_UNDEFINED;
+    private int mSlidingTopMaxDistance = SLIDING_DISTANCE_UNDEFINED;
 
     public static final int SLIDING_DISTANCE_UNDEFINED = -1;
+
+    private OnTouchListener mDelegateTouchListener;
 
     public interface SlidingListener{
         //不能操作繁重的任务在这里
@@ -83,7 +86,7 @@ public class SlidingLayout extends FrameLayout{
         mBackgroundViewLayoutId = a.getResourceId(R.styleable.SlidingLayout_background_view, mBackgroundViewLayoutId);
         mSlidingMode = a.getInteger(R.styleable.SlidingLayout_sliding_mode,SLIDING_MODE_BOTH);
         mSlidingPointerMode = a.getInteger(R.styleable.SlidingLayout_sliding_pointer_mode,SLIDING_POINTER_MODE_MORE);
-        mSlidingMaxDistance = a.getInteger(R.styleable.SlidingLayout_sliding_distance,SLIDING_DISTANCE_UNDEFINED);
+        mSlidingTopMaxDistance = a.getDimensionPixelSize(R.styleable.SlidingLayout_top_max,SLIDING_DISTANCE_UNDEFINED);
         a.recycle();
         if(mBackgroundViewLayoutId != 0){
             View view = View.inflate(getContext(), mBackgroundViewLayoutId, null);
@@ -105,11 +108,11 @@ public class SlidingLayout extends FrameLayout{
     }
 
     public void setSlidingDistance(int distance){
-        this.mSlidingMaxDistance = distance;
+        this.mSlidingTopMaxDistance = distance;
     }
 
     public int setSlidingDistance(){
-        return this.mSlidingMaxDistance;
+        return this.mSlidingTopMaxDistance;
     }
 
     /**
@@ -164,15 +167,22 @@ public class SlidingLayout extends FrameLayout{
         this.addView(view);
     }
 
+    @Override
+    public void setOnTouchListener(OnTouchListener l) {
+//        super.setOnTouchListener(l);
+        mDelegateTouchListener = l;
+    }
+
     public View getTargetView(){
         return this.mTargetView;
     }
 
     public float getSlidingDistance(){
-        if(getTargetView() != null){
-            return Instrument.getInstance().getTranslationY(getTargetView());
-        }
-        return 0;
+        return getInstrument().getTranslationY(getTargetView());
+    }
+
+    public Instrument getInstrument(){
+        return Instrument.getInstance();
     }
 
     @Override
@@ -293,6 +303,9 @@ public class SlidingLayout extends FrameLayout{
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if(mDelegateTouchListener != null && mDelegateTouchListener.onTouch(this,event)){
+            return true;
+        }
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
 //                Log.i("onTouchEvent", "down");
@@ -316,7 +329,7 @@ public class SlidingLayout extends FrameLayout{
                     }
 
                     //pointer delta
-                    delta = Instrument.getInstance().getTranslationY(mTargetView)
+                    delta = getInstrument().getTranslationY(mTargetView)
                             + ((getMotionEventY(event, mActivePointerId) - mLastMotionY))
                             / mSlidingOffset;
 
@@ -330,15 +343,11 @@ public class SlidingLayout extends FrameLayout{
                     movemment = event.getY() - mInitialMotionY;
                 }
 
-                if(mSlidingMaxDistance == SLIDING_DISTANCE_UNDEFINED || movemment < mSlidingMaxDistance){
-                    //超过滑动
-                }
-
                 float distance = getSlidingDistance();
 
                 switch (mSlidingMode){
                     case SLIDING_MODE_BOTH:
-                        Instrument.getInstance().slidingByDelta(mTargetView, delta);
+                        getInstrument().slidingByDelta(mTargetView, delta);
                         break;
                     case SLIDING_MODE_TOP:
                         if(movemment >= 0 || distance > 0){
@@ -347,7 +356,15 @@ public class SlidingLayout extends FrameLayout{
                                 //如果还往上滑，就让它归零
                                 delta = 0;
                             }
-                            Instrument.getInstance().slidingByDelta(mTargetView, delta);
+
+                            if(mSlidingTopMaxDistance == SLIDING_DISTANCE_UNDEFINED || delta < mSlidingTopMaxDistance){
+                                //滑动范围内 for todo
+                            }else{
+                                //超过滑动范围
+                                delta = mSlidingTopMaxDistance;
+                            }
+
+                            getInstrument().slidingByDelta(mTargetView, delta);
                         }
                         break;
                     case SLIDING_MODE_BOTTOM:
@@ -357,7 +374,7 @@ public class SlidingLayout extends FrameLayout{
                                 //如果还往下滑，就让它归零
                                 delta = 0;
                             }
-                            Instrument.getInstance().slidingByDelta(mTargetView, delta);
+                            getInstrument().slidingByDelta(mTargetView, delta);
                         }
                         break;
                 }
@@ -375,7 +392,7 @@ public class SlidingLayout extends FrameLayout{
                 if(mSlidingListener != null){
                     mSlidingListener.onSlidingStateChange(this, STATE_IDLE);
                 }
-                Instrument.getInstance().reset(mTargetView);
+                getInstrument().reset(mTargetView,RESET_DURATION);
                 break;
         }
         //消费触摸
@@ -391,7 +408,7 @@ public class SlidingLayout extends FrameLayout{
     }
 
     public void smoothScrollTo(float y){
-        Instrument.getInstance().smoothTo(mTargetView, y);
+        getInstrument().smoothTo(mTargetView, y, SMOOTH_DURATION);
     }
 
     @Override
@@ -410,71 +427,5 @@ public class SlidingLayout extends FrameLayout{
         mTargetView = null;
         mBackgroundView = null;
         mSlidingListener = null;
-    }
-
-    static class Instrument {
-        private static Instrument mInstrument;
-        public static Instrument getInstance(){
-            if(mInstrument == null){
-                mInstrument = new Instrument();
-            }
-            return mInstrument;
-        }
-
-        public float getTranslationY(View view){
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-                return view.getTranslationY();
-            }else{
-                return ViewHelper.getTranslationY(view);
-            }
-        }
-
-        public void slidingByDelta(final View view ,final float delta){
-            if(view == null){
-                return;
-            }
-            view.clearAnimation();
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-                view.setTranslationY(delta);
-            }else{
-                ViewHelper.setTranslationY(view, delta);
-            }
-        }
-
-        public void slidingToY(final View view ,final float y){
-            if(view == null){
-                return;
-            }
-            view.clearAnimation();
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-                view.setY(y);
-            }else{
-                ViewHelper.setY(view, y);
-            }
-        }
-
-        public void reset(final View view){
-            if(view == null){
-                return;
-            }
-            view.clearAnimation();
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-                android.animation.ObjectAnimator.ofFloat(view, "translationY", 0F).setDuration(RESET_DURATION).start();
-            }else{
-                com.nineoldandroids.animation.ObjectAnimator.ofFloat(view, "translationY", 0F).setDuration(RESET_DURATION).start();
-            }
-        }
-
-        public void smoothTo(final View view ,final float y){
-            if(view == null){
-                return;
-            }
-            view.clearAnimation();
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-                android.animation.ObjectAnimator.ofFloat(view, "translationY", y).setDuration(SMOOTH_DURATION).start();
-            }else{
-                com.nineoldandroids.animation.ObjectAnimator.ofFloat(view, "translationY", y).setDuration(SMOOTH_DURATION).start();
-            }
-        }
     }
 }

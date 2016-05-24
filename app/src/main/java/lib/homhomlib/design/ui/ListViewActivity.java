@@ -3,6 +3,7 @@ package lib.homhomlib.design.ui;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -25,6 +26,19 @@ public class ListViewActivity extends AppCompatActivity {
 //        View front = View.inflate(this,R.layout.view_front,null);
         ListView listView = (ListView) this.findViewById(R.id.listview);
         listView.setAdapter(new Adapter());
+        mSlidingLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()){
+                    case MotionEvent.ACTION_CANCEL:
+                    case MotionEvent.ACTION_UP:
+                        Log.i("onTouch","up");
+                        return false;
+                    default:
+                        return false;
+                }
+            }
+        });
         mSlidingLayout.setSlidingListener(new SlidingLayout.SlidingListener() {
             @Override
             public void onSlidingOffset(View view, float delta) {
