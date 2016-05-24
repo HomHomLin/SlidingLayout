@@ -54,6 +54,10 @@ public class SlidingLayout extends FrameLayout{
     public static final int STATE_SLIDING = 2;
     public static final int STATE_IDLE = 1;
 
+    private int mSlidingMaxDistance = SLIDING_DISTANCE_UNDEFINED;
+
+    public static final int SLIDING_DISTANCE_UNDEFINED = -1;
+
     public interface SlidingListener{
         //不能操作繁重的任务在这里
         public void onSlidingOffset(View view, float delta);
@@ -79,6 +83,7 @@ public class SlidingLayout extends FrameLayout{
         mBackgroundViewLayoutId = a.getResourceId(R.styleable.SlidingLayout_background_view, mBackgroundViewLayoutId);
         mSlidingMode = a.getInteger(R.styleable.SlidingLayout_sliding_mode,SLIDING_MODE_BOTH);
         mSlidingPointerMode = a.getInteger(R.styleable.SlidingLayout_sliding_pointer_mode,SLIDING_POINTER_MODE_MORE);
+        mSlidingMaxDistance = a.getInteger(R.styleable.SlidingLayout_sliding_distance,SLIDING_DISTANCE_UNDEFINED);
         a.recycle();
         if(mBackgroundViewLayoutId != 0){
             View view = View.inflate(getContext(), mBackgroundViewLayoutId, null);
@@ -97,6 +102,14 @@ public class SlidingLayout extends FrameLayout{
 
     public View getBackgroundView(){
         return this.mBackgroundView;
+    }
+
+    public void setSlidingDistance(int distance){
+        this.mSlidingMaxDistance = distance;
+    }
+
+    public int setSlidingDistance(){
+        return this.mSlidingMaxDistance;
     }
 
     /**
@@ -314,18 +327,23 @@ public class SlidingLayout extends FrameLayout{
                     mSlidingListener.onSlidingStateChange(this, STATE_SLIDING);
                     mSlidingListener.onSlidingOffset(this,delta);
                 }
+
+                if(mSlidingMaxDistance == SLIDING_DISTANCE_UNDEFINED || movemment < mSlidingMaxDistance){
+                    //超过滑动
+                }
+
                 switch (mSlidingMode){
                     case SLIDING_MODE_BOTH:
                         Instrument.getInstance().slidingByDelta(mTargetView, delta);
                         break;
                     case SLIDING_MODE_TOP:
-                        if(movemment > 0 ){
+                        if(movemment >= 0 ){
                             //向下滑动
                             Instrument.getInstance().slidingByDelta(mTargetView, delta);
                         }
                         break;
                     case SLIDING_MODE_BOTTOM:
-                        if(movemment < 0 ){
+                        if(movemment <= 0 ){
                             //向下滑动
                             Instrument.getInstance().slidingByDelta(mTargetView, delta);
                         }
