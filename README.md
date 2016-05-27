@@ -101,7 +101,7 @@ SlidingLayout的使用非常简单，你只需要将你想实现的控件在XML�
 
 ## 常用API
 
- * `public void setSlidingOffset(float slidingOffset)` 设置控件的滑动阻力，有效值从1.0F起，值越大可以滑动的幅度越小，默认为2.0F
+ * `public void setSlidingOffset(float slidingOffset)` 设置控件的滑动阻力，有效值为0.1F~1.0F，值越小阻力越大，默认为0.5F
  * `public void setTargetView(View view)` 设置控件的前景View
  * `public void setBackgroundView(View view)` 设置控件的背景View
  * `public void setSlidingListener(SlidingListener slidingListener)` 给控件设置监听，可以监听滑动情况
