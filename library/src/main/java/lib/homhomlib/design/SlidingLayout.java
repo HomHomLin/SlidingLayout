@@ -30,7 +30,7 @@ public class SlidingLayout extends FrameLayout{
     private float mLastMotionY;
     private int mActivePointerId = INVALID_POINTER;
 
-    private float mSlidingOffset = 2.0F;//滑动系数
+    private float mSlidingOffset = 0.5F;//滑动阻力系数
 
     private static final int RESET_DURATION = 200;
     private static final int SMOOTH_DURATION = 1000;
@@ -327,16 +327,30 @@ public class SlidingLayout extends FrameLayout{
                     }
 
                     //pointer delta
+//                    delta = getInstrument().getTranslationY(mTargetView)
+//                            + ((getMotionEventY(event, mActivePointerId) - mLastMotionY))
+//                            / mSlidingOffset;
+
+                    delta = getMotionEventY(event, mActivePointerId) - mLastMotionY;
+
+                    //滑动阻力计算
+//                    float tempOffset = getInstrument().getTranslationY(mTargetView)
+//                            + delta;
+
+                    float tempOffset = 1 - (Math.abs(getInstrument().getTranslationY(mTargetView)
+                            + delta) / mTargetView.getMeasuredHeight());
+
                     delta = getInstrument().getTranslationY(mTargetView)
-                            + ((getMotionEventY(event, mActivePointerId) - mLastMotionY))
-                            / mSlidingOffset;
+                            + delta * mSlidingOffset * tempOffset;
 
                     mLastMotionY = getMotionEventY(event, mActivePointerId);
 
                     //used for judge which side move to
                     movemment = getMotionEventY(event, mActivePointerId) - mInitialMotionY;
                 }else {
-                    delta = (event.getY() - mInitialMotionY) / mSlidingOffset;
+                    float tempOffset = 1 - Math.abs(getInstrument().getTranslationY(mTargetView) / mTargetView.getMeasuredHeight());
+
+                    delta = (event.getY() - mInitialMotionY) * mSlidingOffset * tempOffset;
                     //used for judge which side move to
                     movemment = event.getY() - mInitialMotionY;
                 }
