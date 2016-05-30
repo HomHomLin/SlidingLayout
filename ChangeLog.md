@@ -11,3 +11,8 @@ update:
 ①fix bugs
 ②增加最大下拉距离,top_max
 ③增加代理onTouchListener
+
+0.9.0
+
+update:
+滑动阻力效果替换为越拉越吃力

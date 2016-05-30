@@ -10,7 +10,7 @@ Project site： <https://github.com/HomHomLin/SlidingLayout>.
 
 Demo: <https://github.com/HomHomLin/SlidingLayout/tree/master/demo>.
 
-最新版本:v0.8.1
+最新版本:v0.9.0
 
 ## 效果图：
 
@@ -24,7 +24,7 @@ Demo: <https://github.com/HomHomLin/SlidingLayout/tree/master/demo>.
 
 **Gradle dependency:**
 ``` groovy
-compile 'homhomlin.lib:sldinglayout:0.8.1'
+compile 'homhomlin.lib:sldinglayout:0.9.0'
 ```
 
 or
@@ -34,7 +34,7 @@ or
 <dependency>
   <groupId>homhomlin.lib</groupId>
   <artifactId>sldinglayout</artifactId>
-  <version>0.8.1</version>
+  <version>0.9.0</version>
 </dependency>
 ```
 

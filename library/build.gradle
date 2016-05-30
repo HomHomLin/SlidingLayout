@@ -23,4 +23,4 @@ dependencies {
     compile 'com.nineoldandroids:library:2.4.0'
 }
 
-//apply from: 'https://raw.githubusercontent.com/HomHomLin/Gradle-Publish/master/bintray.gradle'
+apply from: 'https://raw.githubusercontent.com/HomHomLin/Gradle-Publish/master/bintray.gradle'
